@@ -68,6 +68,7 @@ def mode4(frame):
 
 mode5previousFrame = None  # store previous frame
 def mode5(frame):
+	# simple diff
 	global mode5previousFrame
 	if mode5previousFrame is not None:
 		current_frame = frame - mode5previousFrame
@@ -78,8 +79,8 @@ def mode5(frame):
 
 
 def mode6(frame):
-	# do nothing, just pass input
-	return frame
+	# edge detection
+	return cv2.Canny(frame,100,200)
 
 
 def mode7(frame):
