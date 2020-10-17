@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import pafy
-
+import argparse
 
 
 class Flow(object):
@@ -34,24 +34,98 @@ class Flow(object):
 		return new_frame
 
 
+flow = Flow()
+
+
+def mode0(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode1(frame):
+	# convert to grayscale
+	return cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
+
+
+def mode2(frame):
+	# convert to grayscale and histogram equalization
+	frame = mode1(frame)
+	return cv2.equalizeHist(frame)
+
+
+def mode3(frame):
+	# convert to grayscale and histogram normalization
+	frame = mode1(frame)
+	clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+	return clahe.apply(frame)
+
+
+def mode4(frame):
+	# convert to grayscale and calculate motion vectors
+	frame = mode3(frame)
+	return flow.detect_flow(frame)
+
+
+def mode5(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode6(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode7(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode8(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode9(frame):
+	# do nothing, just pass input
+	return frame
+
+
 if __name__ == '__main__':
-	url = "https://youtu.be/kNcV9Gy5lQc"
-	camera_source = pafy.new(url).getbest()  #.allstreams[0]
-	capture = cv2.VideoCapture(camera_source.url)
-	flow = Flow()
+	# Parse input parameters
+	parser = argparse.ArgumentParser()
+	input = parser.add_mutually_exclusive_group()
+	input.add_argument("-camera", dest='camera', type=int, help="Number of a computer camera to use as an input, for example: 0", default=0, nargs='?')
+	input.add_argument("-file", dest='file', type=str, help="Name of a file to use as an input, for example: movie.mp4", nargs='?')
+	input.add_argument("-stream", dest='stream', type=str, help="Youtube video id to use as an input, for example: WHPEKLQID4U", nargs='?')
+	parser.add_argument("-mode", dest="mode", type=int, help="Visualization mode", choices=range(10), default=0, nargs='?')
+	args = parser.parse_args()
+
+	# Configure input
+	if args.stream:
+		camera_source = pafy.new(args.stream).getbest()  # use youtube videos, sometimes live cameras can be problematic
+		capture = cv2.VideoCapture(camera_source.url)
+	elif args.file:
+		capture = cv2.VideoCapture(args.file)
+	else:
+		capture = cv2.VideoCapture(args.camera)
+
+	mode = args.mode
+	modes = [mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7, mode8, mode9]
 	while (True):
 		# Capture frame-by-frame
 		ret, current_frame = capture.read()
 		
 		if ret:
-			gray = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
-			# gray = cv2.equalizeHist(gray)
-			clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-			gray = clahe.apply(gray)
-			current_frame = flow.detect_flow(gray)
+			current_frame = modes[mode](current_frame)
 			cv2.imshow('frame', current_frame)
-
-		if cv2.waitKey(1) & 0xFF == ord('q'):
+		else:
 			break
+
+		key = cv2.waitKey(1) & 0xFF
+		if key == ord('q'):
+			break
+		if key >= ord('0') and key <= ord('9'):
+			mode = key - ord('0')
 	capture.release()
 	cv2.destroyAllWindows()

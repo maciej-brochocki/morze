@@ -8,4 +8,8 @@ Sea sculpture for morze band
   
   python -m pip install -r requirements.txt
   
-  python main.py
+  python main.py -h
+
+  python main.py -camera 0
+
+  python main.py -stream WHPEKLQID4U
