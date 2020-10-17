@@ -66,9 +66,15 @@ def mode4(frame):
 	return flow.detect_flow(frame)
 
 
+mode5previousFrame = None  # store previous frame
 def mode5(frame):
-	# do nothing, just pass input
-	return frame
+	global mode5previousFrame
+	if mode5previousFrame is not None:
+		current_frame = frame - mode5previousFrame
+	else:
+		current_frame = frame
+	mode5previousFrame = frame
+	return current_frame
 
 
 def mode6(frame):
