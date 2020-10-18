@@ -121,6 +121,7 @@ if __name__ == '__main__':
 	input.add_argument("-file", dest='file', type=str, help="Name of a file to use as an input, for example: movie.mp4", nargs='?')
 	input.add_argument("-stream", dest='stream', type=str, help="Youtube video id to use as an input, for example: WHPEKLQID4U", nargs='?')
 	parser.add_argument("-mode", dest="mode", type=int, help="Visualization mode", choices=range(10), default=0, nargs='?')
+	parser.add_argument("-output", dest="output", type=str, help="Save result to a file, for example: output.avi", nargs='?')
 	args = parser.parse_args()
 
 	# Configure input
@@ -132,6 +133,16 @@ if __name__ == '__main__':
 	else:
 		capture = cv2.VideoCapture(args.camera)
 
+	# Configure output
+	if args.output:
+		frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+		frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+		fps = capture.get(cv2.CAP_PROP_FPS)
+		out = cv2.VideoWriter(args.output, cv2.VideoWriter_fourcc('F','F','V','1'), fps, (frame_width, frame_height))
+		print("Writing:", args.output, frame_width, "x", frame_height, "@", fps)
+	else:
+		out = None
+
 	mode = args.mode
 	modes = [mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7, mode8, mode9]
 	while (True):
@@ -141,6 +152,8 @@ if __name__ == '__main__':
 		if ret:
 			current_frame = modes[mode](current_frame)
 			cv2.imshow('frame', current_frame)
+			if out:
+				out.write(current_frame)
 		else:
 			break
 
@@ -150,4 +163,6 @@ if __name__ == '__main__':
 		if key >= ord('0') and key <= ord('9'):
 			mode = key - ord('0')
 	capture.release()
+	if out:
+		out.release()
 	cv2.destroyAllWindows()
