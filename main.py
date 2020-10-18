@@ -83,9 +83,24 @@ def mode6(frame):
 	return cv2.Canny(frame,100,200)
 
 
+mode7previousFrame = None  # store previous frame
+mode7previousFrame2 = None  # store previous previous frame
+mode7previousFrame3 = None  # store previous previous previous frame
 def mode7(frame):
-	# do nothing, just pass input
-	return frame
+	# buffered diff
+	global mode7previousFrame
+	global mode7previousFrame2
+	global mode7previousFrame3
+	if mode7previousFrame is not None:
+		current_frame = (frame - mode7previousFrame - mode7previousFrame2 - mode7previousFrame3)/4 - frame
+		mode7previousFrame3 = mode7previousFrame2
+		mode7previousFrame2 = mode7previousFrame
+	else:
+		current_frame = frame
+		mode7previousFrame2 = frame
+		mode7previousFrame3 = frame
+	mode7previousFrame = frame
+	return current_frame
 
 
 def mode8(frame):
