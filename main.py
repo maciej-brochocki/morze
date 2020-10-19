@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import pafy
 import argparse
+import time
 
 
 class Flow(object):
@@ -122,6 +123,7 @@ if __name__ == '__main__':
 	input.add_argument("-stream", dest='stream', type=str, help="Youtube video id to use as an input, for example: WHPEKLQID4U", nargs='?')
 	parser.add_argument("-mode", dest="mode", type=int, help="Visualization mode", choices=range(10), default=0, nargs='?')
 	parser.add_argument("-output", dest="output", type=str, help="Save result to a file, for example: output.avi", nargs='?')
+	parser.add_argument("-speed", dest="speed", type=float, help="Playback speed (by default play with max fps), for example: 1.0", nargs='?')
 	args = parser.parse_args()
 
 	# Configure input
@@ -134,10 +136,10 @@ if __name__ == '__main__':
 		capture = cv2.VideoCapture(args.camera)
 
 	# Configure output
+	fps = capture.get(cv2.CAP_PROP_FPS)
 	if args.output:
 		frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
 		frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-		fps = capture.get(cv2.CAP_PROP_FPS)
 		out = cv2.VideoWriter(args.output, cv2.VideoWriter_fourcc('F','F','V','1'), fps, (frame_width, frame_height))
 		print("Writing:", args.output, frame_width, "x", frame_height, "@", fps)
 	else:
@@ -145,7 +147,15 @@ if __name__ == '__main__':
 
 	mode = args.mode
 	modes = [mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7, mode8, mode9]
+	last_ts = 0
 	while (True):
+		if args.speed:
+			ts = time.time()
+			diff = min((1 / fps) / args.speed, (1 / fps) / args.speed - (ts - last_ts))
+			if diff > 0:
+				time.sleep(diff)
+			last_ts = time.time()
+
 		# Capture frame-by-frame
 		ret, current_frame = capture.read()
 		
