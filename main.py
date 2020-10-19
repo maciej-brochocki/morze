@@ -105,11 +105,69 @@ def mode7(frame):
 
 
 def mode8(frame):
+	# fft
+	f = np.fft.fft2(frame)
+	fshift = np.fft.fftshift(f)
+	magnitude_spectrum = 20*np.log(np.abs(fshift))
+	return magnitude_spectrum
+
+
+def mode9(frame):
 	# do nothing, just pass input
 	return frame
 
 
-def mode9(frame):
+def mode10(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode11(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode12(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode13(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode14(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode15(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode16(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode17(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode18(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode18(frame):
+	# do nothing, just pass input
+	return frame
+
+
+def mode19(frame):
 	# do nothing, just pass input
 	return frame
 
@@ -121,7 +179,7 @@ if __name__ == '__main__':
 	input.add_argument("-camera", dest='camera', type=int, help="Number of a computer camera to use as an input, for example: 0", default=0, nargs='?')
 	input.add_argument("-file", dest='file', type=str, help="Name of a file to use as an input, for example: movie.mp4", nargs='?')
 	input.add_argument("-stream", dest='stream', type=str, help="Youtube video id to use as an input, for example: WHPEKLQID4U", nargs='?')
-	parser.add_argument("-mode", dest="mode", type=int, help="Visualization mode", choices=range(10), default=0, nargs='?')
+	parser.add_argument("-mode", dest="mode", type=int, help="Visualization mode", choices=range(20), default=0, nargs='?')
 	parser.add_argument("-output", dest="output", type=str, help="Save result to a file, for example: output.avi", nargs='?')
 	parser.add_argument("-speed", dest="speed", type=float, help="Playback speed (by default play with max fps), for example: 1.0", nargs='?')
 	args = parser.parse_args()
@@ -146,7 +204,9 @@ if __name__ == '__main__':
 		out = None
 
 	mode = args.mode
-	modes = [mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7, mode8, mode9]
+	modes = [mode0, mode1, mode2, mode3, mode4, mode5, mode6, mode7, mode8, mode9,
+		mode10, mode11, mode12, mode13, mode14, mode15, mode16, mode17, mode18, mode19
+	]
 	last_ts = 0
 	while (True):
 		if args.speed:
@@ -172,6 +232,8 @@ if __name__ == '__main__':
 			break
 		if key >= ord('0') and key <= ord('9'):
 			mode = key - ord('0')
+		if key >= ord('a') and key <= ord('j'):
+			mode = key - ord('a') + 10
 	capture.release()
 	if out:
 		out.release()
