@@ -106,10 +106,19 @@ def mode7(frame):
 
 def mode8(frame):
 	# fft
+	# https://docs.opencv.org/master/de/dbc/tutorial_py_fourier_transform.html
+	frame = mode1(frame)
+
 	f = np.fft.fft2(frame)
 	fshift = np.fft.fftshift(f)
-	magnitude_spectrum = 20*np.log(np.abs(fshift))
-	return magnitude_spectrum
+	# return 20*np.log(np.abs(fshift))
+	
+	rows, cols = frame.shape
+	crow,ccol = rows//2 , cols//2
+	fshift[crow-30:crow+31, ccol-30:ccol+31] = 0
+	f_ishift = np.fft.ifftshift(fshift)
+	img_back = np.fft.ifft2(f_ishift)
+	return np.real(img_back)
 
 
 def mode9(frame):
