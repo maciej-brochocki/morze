@@ -105,7 +105,7 @@ def mode7(frame):
 
 
 def mode8(frame):
-	# fft
+	# FFT
 	# https://docs.opencv.org/master/de/dbc/tutorial_py_fourier_transform.html
 	frame = mode1(frame)
 
@@ -122,8 +122,26 @@ def mode8(frame):
 
 
 def mode9(frame):
-	# do nothing, just pass input
-	return frame
+	# HSV
+	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+	rows, cols, ch = frame.shape
+	hist = np.zeros(256)
+	for r in range(rows):
+		for c in range(cols):
+			hist[hsv[r][c][0]] += hsv[r][c][2]
+	hist = cv2.normalize(hist,None,0,255,cv2.NORM_MINMAX)
+
+	hist_hsv = np.zeros((256, 256, 3), dtype=np.uint8)
+	hist_hsv[..., 0] = range(256)
+	hist_hsv[..., 1] = 255
+	for r in range(256):
+		for c in range(256):
+			if hist[c] <= 255 - r:
+				hist_hsv[r][c][2] = 0
+			else:
+				hist_hsv[r][c][2] = 255
+	new_frame = cv2.cvtColor(hist_hsv, cv2.COLOR_HSV2BGR)
+	return new_frame
 
 
 def mode10(frame):
