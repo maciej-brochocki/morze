@@ -118,9 +118,10 @@ def mode8(frame):
 	fshift[crow-30:crow+31, ccol-30:ccol+31] = 0
 	f_ishift = np.fft.ifftshift(fshift)
 	img_back = np.fft.ifft2(f_ishift)
-	return np.real(img_back)
+	return np.real(img_back).astype(np.uint8)
 
 
+HIST_HEIGHT = 100
 def mode9(frame):
 	# HSV
 	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -129,19 +130,21 @@ def mode9(frame):
 	for r in range(rows):
 		for c in range(cols):
 			hist[hsv[r][c][0]] += hsv[r][c][2]
-	hist = cv2.normalize(hist,None,0,255,cv2.NORM_MINMAX)
+	hist = cv2.normalize(hist,None,0,HIST_HEIGHT,cv2.NORM_MINMAX)
 
-	hist_hsv = np.zeros((256, 256, 3), dtype=np.uint8)
+	hist_hsv = np.zeros((HIST_HEIGHT, 256, 3), dtype=np.uint8)
 	hist_hsv[..., 0] = range(256)
 	hist_hsv[..., 1] = 255
-	for r in range(256):
+	for r in range(HIST_HEIGHT):
 		for c in range(256):
-			if hist[c] <= 255 - r:
+			if hist[c] <= HIST_HEIGHT - r:
 				hist_hsv[r][c][2] = 0
 			else:
 				hist_hsv[r][c][2] = 255
 	new_frame = cv2.cvtColor(hist_hsv, cv2.COLOR_HSV2BGR)
-	return new_frame
+
+	frame[rows - HIST_HEIGHT: rows, 0: 256] = new_frame
+	return frame
 
 
 def mode10(frame):
@@ -249,7 +252,10 @@ if __name__ == '__main__':
 		if ret:
 			current_frame = modes[mode](current_frame)
 			cv2.imshow('frame', current_frame)
+			print()
 			if out:
+				if len(current_frame.shape) == 2:
+					current_frame = cv2.cvtColor(current_frame, cv2.COLOR_GRAY2RGB)
 				out.write(current_frame)
 		else:
 			break
