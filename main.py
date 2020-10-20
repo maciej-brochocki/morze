@@ -92,8 +92,9 @@ def mode7(frame):
 	global mode7previousFrame
 	global mode7previousFrame2
 	global mode7previousFrame3
+	frame = cv2.blur(frame,(16,16));
 	if mode7previousFrame is not None:
-		current_frame = (frame - mode7previousFrame - mode7previousFrame2 - mode7previousFrame3)/4 - frame
+		current_frame = frame - (mode7previousFrame + mode7previousFrame2 + mode7previousFrame3)/3
 		mode7previousFrame3 = mode7previousFrame2
 		mode7previousFrame2 = mode7previousFrame
 	else:
@@ -101,6 +102,7 @@ def mode7(frame):
 		mode7previousFrame2 = frame
 		mode7previousFrame3 = frame
 	mode7previousFrame = frame
+	current_frame = cv2.blur(current_frame,(8,8));
 	return current_frame
 
 
