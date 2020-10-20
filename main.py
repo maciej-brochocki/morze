@@ -84,6 +84,12 @@ def mode6(frame):
 	return cv2.Canny(frame,100,200)
 
 
+def float2int(frame):
+	# return frame  # uncomment to see previous modes 7 & 8
+	# return frame.astype(np.uint8)
+	return (frame*255).astype(np.uint8)
+
+
 mode7previousFrame = None  # store previous frame
 mode7previousFrame2 = None  # store previous previous frame
 mode7previousFrame3 = None  # store previous previous previous frame
@@ -103,7 +109,7 @@ def mode7(frame):
 		mode7previousFrame3 = frame
 	mode7previousFrame = frame
 	current_frame = cv2.blur(current_frame,(8,8));
-	return current_frame
+	return float2int(current_frame)
 
 
 def mode8(frame):
@@ -120,7 +126,7 @@ def mode8(frame):
 	fshift[crow-30:crow+31, ccol-30:ccol+31] = 0
 	f_ishift = np.fft.ifftshift(fshift)
 	img_back = np.fft.ifft2(f_ishift)
-	return np.real(img_back).astype(np.uint8)
+	return float2int(np.real(img_back))
 
 
 HIST_HEIGHT = 100
