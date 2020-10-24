@@ -100,7 +100,7 @@ def mode7(frame):
 	global mode7previousFrame2
 	global mode7previousFrame3
 	global mode7previousFrame4
-	frame = cv2.blur(frame,(8,8));
+	frame = cv2.bilateralFilter(frame,8,100,100)
 	if mode7previousFrame is not None:
 		current_frame = frame - (mode7previousFrame + mode7previousFrame2 + mode7previousFrame3 + mode7previousFrame4)/4
 		mode7previousFrame4 = mode7previousFrame3
