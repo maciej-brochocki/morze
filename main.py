@@ -113,7 +113,7 @@ def mode7(frame):
 		mode7previousFrame4 = frame
 	mode7previousFrame = frame
 	current_frame = cv2.blur(current_frame,(4,4));
-	return current_frame
+	return float2int(current_frame)
 
 
 def mode8(frame):
