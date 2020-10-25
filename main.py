@@ -93,23 +93,27 @@ def float2int(frame):
 mode7previousFrame = None  # store previous frame
 mode7previousFrame2 = None  # store previous previous frame
 mode7previousFrame3 = None  # store previous previous previous frame
+mode7previousFrame4 = None  # hesu
 def mode7(frame):
 	# buffered diff
 	global mode7previousFrame
 	global mode7previousFrame2
 	global mode7previousFrame3
-	frame = cv2.blur(frame,(16,16));
+	global mode7previousFrame4
+	frame = cv2.bilateralFilter(frame,8,100,100)
 	if mode7previousFrame is not None:
-		current_frame = frame - (mode7previousFrame + mode7previousFrame2 + mode7previousFrame3)/3
+		current_frame = frame - (mode7previousFrame + mode7previousFrame2 + mode7previousFrame3 + mode7previousFrame4)/4
+		mode7previousFrame4 = mode7previousFrame3
 		mode7previousFrame3 = mode7previousFrame2
 		mode7previousFrame2 = mode7previousFrame
 	else:
 		current_frame = frame
 		mode7previousFrame2 = frame
 		mode7previousFrame3 = frame
+		mode7previousFrame4 = frame
 	mode7previousFrame = frame
-	current_frame = cv2.blur(current_frame,(8,8));
-	return float2int(current_frame)
+	current_frame = cv2.blur(current_frame,(4,4));
+	return current_frame
 
 
 def mode8(frame):
