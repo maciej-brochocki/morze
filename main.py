@@ -85,9 +85,9 @@ def mode6(frame):
 
 
 def float2int(frame):
-	# return frame  # uncomment to see previous modes 7 & 8
-	# return frame.astype(np.uint8)
-	return (frame*255).astype(np.uint8)
+	frame = np.clip(frame, 0, 1)
+	frame = frame * 255
+	return frame.astype(np.uint8)
 
 
 mode7previousFrame = None  # store previous frame
@@ -113,7 +113,7 @@ def mode7(frame):
 		mode7previousFrame4 = frame
 	mode7previousFrame = frame
 	current_frame = cv2.blur(current_frame,(4,4));
-	return current_frame
+	return float2int(current_frame)
 
 
 def mode8(frame):
@@ -159,9 +159,26 @@ def mode9(frame):
 	return frame
 
 
+PREV_FRAMES = 3
+mode10previousFrames = []  # store previous frames
 def mode10(frame):
-	# do nothing, just pass input
-	return frame
+	# buffered diff
+	global mode10previousFrames
+	frame = cv2.blur(frame,(16,16));
+	if len(mode10previousFrames) > 0:
+		avg = mode10previousFrames[0]
+		for i in range(1, PREV_FRAMES):
+			avg += mode10previousFrames[i]
+		avg = avg / PREV_FRAMES
+		current_frame = frame - avg
+		mode10previousFrames.pop(0)
+	else:
+		current_frame = frame
+		for i in range(PREV_FRAMES - 1):
+			mode10previousFrames.append(frame)
+	mode10previousFrames.append(frame)
+	current_frame = cv2.blur(current_frame,(8,8));
+	return (current_frame*255).astype(np.uint8)
 
 
 def mode11(frame):
@@ -264,7 +281,6 @@ if __name__ == '__main__':
 		if ret:
 			current_frame = modes[mode](current_frame)
 			cv2.imshow('frame', current_frame)
-			print()
 			if out:
 				if len(current_frame.shape) == 2:
 					current_frame = cv2.cvtColor(current_frame, cv2.COLOR_GRAY2RGB)
