@@ -1,4 +1,5 @@
 numpy==1.19.2
 opencv-python==4.4.0.44
 pafy==0.5.5
-youtube-dl==2020.9.20
+panda3d==1.10.7
+youtube-dl==2020.12.26
